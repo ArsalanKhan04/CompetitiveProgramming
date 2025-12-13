@@ -1,0 +1,242 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+#define ull unsigned long long int
+#define ll long long int
+#define FL(i, a, b) for (int i = a; i < b; i++)
+#define FE(i, a, b) for (int i = a; i <= b; i++)
+#define FF(i, a, b) for (int i = a; i > b; i--)
+#define FFE(i, a, b) for (int i = a; i >= b; i--)
+#define ALL(x) x.begin(), x.end()
+#define RALL(x) x.rbegin(), x.rend()
+#define pb push_back
+#define F first
+#define S second
+#define pii pair<int, int>
+#define vpii vector<pii>
+#define vll vector<ll>
+#define vvll vector<vll>
+#define vi vector<int>
+#define vvi vector<vi>
+#define vb vector<bool>
+#define vvb vector<vb>
+#define vll vector<ll>
+#define vvll vector<vll>
+#define endl '\n'
+#define REMAX(a, b) a = max((a), (b))
+#define REMIN(a, b) a = min((a), (b))
+
+void dbg_out() { cerr << endl; }
+template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr << ' ' << H; dbg_out(T...); }
+#ifdef KRAKAR
+#define dbg(...) cerr << '[' << ':' << __LINE__ << "] (" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
+#else
+#define dbg(...)
+#endif
+#define condprt(x) cout << ((x) ? "YES" : "NO") << endl
+
+template<class Info>
+struct SegmentTree {
+    int n;
+    std::vector<Info> info;
+    SegmentTree() : n(0) {}
+    SegmentTree(int n_, Info v_ = Info()) {
+        init(n_, v_);
+    }
+    template<class T>
+    SegmentTree(std::vector<T> init_) {
+        init(init_);
+    }
+    void init(int n_, Info v_ = Info()) {
+        init(std::vector(n_, v_));
+    }
+    template<class T>
+    void init(std::vector<T> init_) {
+        n = init_.size();
+        info.assign(4 << std::__lg(n), Info());
+        std::function<void(int, int, int)> build = [&](int p, int l, int r) {
+            if (r - l == 1) {
+                info[p] = init_[l];
+                return;
+            }
+            int m = (l + r) / 2;
+            build(2 * p, l, m);
+            build(2 * p + 1, m, r);
+            pull(p);
+        };
+        build(1, 0, n);
+    }
+    void pull(int p) {
+        info[p] = info[2 * p] + info[2 * p + 1];
+    }
+    void modify(int p, int l, int r, int x, const Info &v) {
+        if (r - l == 1) {
+            info[p] = v;
+            return;
+        }
+        int m = (l + r) / 2;
+        if (x < m) {
+            modify(2 * p, l, m, x, v);
+        } else {
+            modify(2 * p + 1, m, r, x, v);
+        }
+        pull(p);
+    }
+    void modify(int p, const Info &v) {
+        modify(1, 0, n, p, v);
+    }
+    Info rangeQuery(int p, int l, int r, int x, int y) {
+        if (l >= y || r <= x) {
+            return Info();
+        }
+        if (l >= x && r <= y) {
+            return info[p];
+        }
+        int m = (l + r) / 2;
+        return rangeQuery(2 * p, l, m, x, y) + rangeQuery(2 * p + 1, m, r, x, y);
+    }
+    Info rangeQuery(int l, int r) {
+        return rangeQuery(1, 0, n, l, r);
+    }
+    template<class F>
+    int findFirst(int p, int l, int r, int x, int y, F &&pred) {
+        if (l >= y || r <= x) {
+            return -1;
+        }
+        if (l >= x && r <= y && !pred(info[p])) {
+            return -1;
+        }
+        if (r - l == 1) {
+            return l;
+        }
+        int m = (l + r) / 2;
+        int res = findFirst(2 * p, l, m, x, y, pred);
+        if (res == -1) {
+            res = findFirst(2 * p + 1, m, r, x, y, pred);
+        }
+        return res;
+    }
+    template<class F>
+    int findFirst(int l, int r, F &&pred) {
+        return findFirst(1, 0, n, l, r, pred);
+    }
+    template<class F>
+    int findLast(int p, int l, int r, int x, int y, F &&pred) {
+        if (l >= y || r <= x) {
+            return -1;
+        }
+        if (l >= x && r <= y && !pred(info[p])) {
+            return -1;
+        }
+        if (r - l == 1) {
+            return l;
+        }
+        int m = (l + r) / 2;
+        int res = findLast(2 * p + 1, m, r, x, y, pred);
+        if (res == -1) {
+            res = findLast(2 * p, l, m, x, y, pred);
+        }
+        return res;
+    }
+    template<class F>
+    int findLast(int l, int r, F &&pred) {
+        return findLast(1, 0, n, l, r, pred);
+    }
+};
+
+constexpr ll inf = (ll) 1e12;
+
+struct Info {
+    ll lmin, rmin;
+    Info() : lmin(inf), rmin(inf) {}
+    Info(ll lmn, ll rmn) : lmin(lmn), rmin(rmn) {}
+    Info operator+(const Info &rhs) const {
+      Info info;
+      info.lmin = min(lmin, rhs.lmin);
+      info.rmin = min(rmin, rhs.rmin);
+      return info;
+    }
+};
+
+int main() {
+
+  ios_base::sync_with_stdio(false);
+#ifdef KRAKAR
+    ifstream fileIn("input.txt"); 
+    cin.rdbuf(fileIn.rdbuf()); 
+    ofstream fileOut("output.txt"); 
+    cout.rdbuf(fileOut.rdbuf()); 
+    auto _clock_start = chrono::high_resolution_clock::now();
+#else
+    cin.tie(0);
+#endif
+
+    int TCS = 1;
+    // cin >> TCS;
+    while(TCS--){
+      int n;
+      cin >> n;
+      vll a(n + 1);
+      FL(i, 1, n + 1)
+        cin >> a[i];
+      vpii p(n + 1);
+      FL(i, 1, n + 1)
+        cin >> p[i].F >> p[i].S;
+
+      SegmentTree<Info> seggy(2 * n + 5);
+      FL(i, 1, n + 1){
+        Info rv = seggy.rangeQuery(p[i].F, p[i].F + 1);
+        Info lv = seggy.rangeQuery(p[i].S, p[i].S + 1);
+        rv.rmin = min(rv.rmin, a[i]);
+        lv.lmin = min(lv.lmin, a[i]);
+        seggy.modify(p[i].F, rv);
+        seggy.modify(p[i].S, lv);
+      }
+
+      auto inter = [&](int u, int v){
+        return (p[u].F <= p[v].S && p[v].F <= p[u].S);
+      };
+
+      int q;
+      cin >> q;
+      while (q--){
+        int u, v;
+        cin >> u >> v;
+        if (inter(u, v)){
+          int lval = min(p[u].F, p[v].F);
+          int rval = max(p[u].S, p[v].S);
+
+          if (p[u].F > p[v].F) swap(u, v);
+
+          Info lft = seggy.rangeQuery(0, lval);
+          Info rgt = seggy.rangeQuery(rval + 1, 2 * n + 3);
+          ll onvl = min(lft.lmin, rgt.rmin);
+          ll twvl1, twvl2, twvl;
+          lft = seggy.rangeQuery(0, p[v].F);
+          rgt = seggy.rangeQuery(p[v].S + 1, 2 * n + 3);
+          twvl1 = min(lft.lmin, rgt.rmin);
+          lft = seggy.rangeQuery(0, p[u].F);
+          rgt = seggy.rangeQuery(p[u].S + 1, 2 * n + 3);
+          twvl2 = min(lft.lmin, rgt.rmin);
+          twvl = twvl1 + twvl2;
+
+          assert(twvl > 0);
+          if (min(twvl, onvl) >= inf){
+            cout << -1 << endl;
+          } else {
+            cout << a[u] + a[v] + min(twvl, onvl) << endl;
+          }
+        } else {
+          cout << a[u] + a[v] << endl;
+        }
+      }
+    }
+#ifdef KRAKAR
+  cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
+      chrono::high_resolution_clock::now()
+      - _clock_start).count() << "ms." << endl;
+#endif
+  return 0;
+
+}
+

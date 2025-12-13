@@ -1,0 +1,101 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+#define ull unsigned long long int
+#define ll long long int
+#define FL(i, a, b) for (int i = a; i < b; i++)
+#define FE(i, a, b) for (int i = a; i <= b; i++)
+#define FF(i, a, b) for (int i = a; i > b; i--)
+#define FFE(i, a, b) for (int i = a; i >= b; i--)
+#define ALL(x) x.begin(), x.end()
+#define RALL(x) x.rbegin(), x.rend()
+#define pb push_back
+#define F first
+#define S second
+#define pii pair<int, int>
+#define vpii vector<pii>
+#define vll vector<ll>
+#define vvll vector<vll>
+#define vi vector<int>
+#define vvi vector<vi>
+#define vb vector<bool>
+#define vvb vector<vb>
+#define vll vector<ll>
+#define vvll vector<vll>
+#define endl '\n'
+#define REMAX(a, b) a = max((a), (b))
+#define REMIN(a, b) a = min((a), (b))
+
+void dbg_out() { cerr << endl; }
+template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr << ' ' << H; dbg_out(T...); }
+#ifdef KRAKAR
+#define dbg(...) cerr << '[' << ':' << __LINE__ << "] (" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
+#else
+#define dbg(...)
+#endif
+#define condprt(x) cout << ((x) ? "YES" : "NO") << endl
+
+
+const int INF = 5e5;
+const int mx = 5e4 + 1;
+
+int main() {
+
+  ios_base::sync_with_stdio(false);
+#ifdef KRAKAR
+    ifstream fileIn("input.txt"); 
+    cin.rdbuf(fileIn.rdbuf()); 
+    ofstream fileOut("output.txt"); 
+    cout.rdbuf(fileOut.rdbuf()); 
+    auto _clock_start = chrono::high_resolution_clock::now();
+#else
+    cin.tie(0);
+#endif
+
+    int TCS = 1;
+    cin >> TCS;
+    while(TCS--){
+      int n, X, Y;
+      cin >> n >> X >> Y;
+      vi a(n);
+      vi dp(mx, INF);
+      set<pair<int, int>, greater<pair<int,int>>> st1;
+      int k = -1;
+      int k_d = n;
+      FL(i, 0, n){
+        cin >> a[i];
+      }
+      FL(i, 0, n){
+        if (a[i] <= Y) {k_d = i; break;}
+      }
+      FL(i, 0, k_d){
+        st1.insert({a[i], i});
+      }
+      dp[X] = 0;
+      for (auto ky: st1){
+        for (int i = mx - 1; i >= 0; i--){
+          if (dp[i] != INF){
+            dp[i%ky.F] = min(dp[i%ky.F], max(dp[i], ky.S));
+          }
+        }
+      }
+      k = dp[Y];
+      if (k == -1) {
+        cout << 0 << endl << endl;
+        continue;
+      }
+      cout << max(k_d - k, 0) << endl;
+      FL(i, k, k_d){
+        cout << i + 1 << " ";
+      }
+      cout << endl;
+    }
+#ifdef KRAKAR
+  cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
+      chrono::high_resolution_clock::now()
+      - _clock_start).count() << "ms." << endl;
+#endif
+  return 0;
+
+}
+
