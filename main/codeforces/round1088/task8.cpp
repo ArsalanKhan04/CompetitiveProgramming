@@ -53,27 +53,35 @@ int main() {
     int TCS = 1;
     cin >> TCS;
     while(TCS--){
-      int n;
-      cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
-      }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+      string s; cin >> s;
+      int n = s.size();
+      s = "$" + s;
+      vvi dp(n+1, vi(6,-1e9));
+      dp[0][0] = 0;
+      FL(i,1,n+1){
+        if (s[i] == '1'){
+          dp[i][4] = max(dp[i-1][4], dp[i-1][0]) + 1;
+          dp[i][3] = max(dp[i-1][2], dp[i-1][3]) + 1;
+          dp[i][1] = dp[i-1][0];
+          dp[i][0] = dp[i-1][5];
+        } else {
+          dp[i][5] = dp[i-1][4];
+          dp[i][2] = dp[i-1][1];
+          dp[i][0] = dp[i-1][3];
         }
+        dp[i][0] = max(max(dp[i][0], dp[i-1][0]), dp[i][3]);
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
+      /*
+      FL(j, 0, 6){
+        FL(i,0,n+1){
+          cerr << dp[i][j] << " ";
+        }
+        cerr << endl;
       }
-      cout << endl;
+      cerr << endl;
+      */
+      cout << dp[n][0] << endl;
     }
-
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

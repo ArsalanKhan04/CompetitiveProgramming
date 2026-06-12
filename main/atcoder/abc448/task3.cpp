@@ -51,29 +51,33 @@ int main() {
 #endif
 
     int TCS = 1;
-    cin >> TCS;
+    // cin >> TCS;
     while(TCS--){
-      int n;
-      cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
+      int n, q;
+      cin >> n >> q;
+      vpii a(n);
+      set<pii> prm, tmp;
+      FL(i, 0, n){
+        cin >> a[i].F;
+        a[i].S = i;
+        prm.insert(a[i]);
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+      FL(i,0,q){
+        int k; cin >> k;
+        vi b(k);
+        FL(j,0,k) {
+          cin >> b[j];
+          b[j]--;
+        }
+        FL(j,0,k){
+          prm.erase(a[b[j]]);
+        }
+        cout << prm.begin()->F << endl;
+        FL(j,0,k){
+          prm.insert(a[b[j]]);
         }
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
     }
-
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

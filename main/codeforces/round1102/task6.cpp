@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -55,25 +56,70 @@ int main() {
     while(TCS--){
       int n;
       cin >> n;
-      vi a(n);
+      vll h(n);
       FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
+        cin >> h[i];
+      int rt = 0;
       FL(i,0,n){
-        b[a[i]] = i;
+        if (h[rt] < h[i]) rt = i;
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+      rotate(h.begin(), h.begin()+rt+1, h.end());
+      for (auto vl: h) cerr << vl << " ";
+      cerr << endl;
+
+      vll prf(n, 0);
+      vll suf(n, 0);
+      stack<pair<ll, int>> stk;
+      // prf is initially 0 and stack is empty
+      // left of l
+      // when w0 is empty nothing to the left of it
+      ll sm = 0;
+      FL(i,1,n){
+        int cnt = 0;
+        while (!stk.empty() && stk.top().F < h[i-1]){
+          sm -= stk.top().F * stk.top().S;
+          cnt += stk.top().S; stk.pop();
         }
+        stk.push({h[i-1], cnt+1});
+        sm += h[i-1]*(cnt+1);
+        prf[i] = sm;
       }
+      stk = stack<pair<ll, int>>();
+      sm = 0;
+      for (int i = n-2; i>=0; i--){
+        int cnt = 0;
+        while (!stk.empty() && stk.top().F < h[i]){
+          sm -= stk.top().F * stk.top().S;
+          cnt += stk.top().S; stk.pop();
+        }
+        stk.push({h[i], cnt+1});
+        sm += h[i]*(cnt+1);
+        suf[i] = sm;
+      }
+
+      auto ans = prf;
       FL(i,0,n){
-        cout << a[i] << " ";
+        ans[i] = prf[i] + suf[i];
+      }
+      rotate(ans.begin(), ans.begin()+n-(rt+1), ans.end());
+      FL(i,0,n){
+        cout << ans[i] << " ";
       }
       cout << endl;
-    }
+      /*
+      FL(i,0,n){
+        cout << suf[i] << " ";
+      }
+      cout << endl;
 
+      cout << endl;
+      */
+
+
+
+
+
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

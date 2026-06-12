@@ -36,6 +36,25 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define condprt(x) cout << ((x) ? "YES" : "NO") << endl
 
 
+struct Tree {
+	typedef int T;
+	static constexpr T unit = INT_MIN;
+	T f(T a, T b) { return max(a, b); } // (any associative fn)
+	vector<T> s; int n;
+	Tree(int n_ = 0, T def = unit) : s(2*n_, def), n(n_) {}
+	void update(int pos, T val) {
+		for (s[pos += n] = val; pos /= 2;)
+			s[pos] = f(s[pos * 2], s[pos * 2 + 1]);
+	}
+	T query(int b, int e) { // query [b, e)
+		T ra = unit, rb = unit;
+		for (b += n, e += n; b < e; b /= 2, e /= 2) {
+			if (b % 2) ra = f(ra, s[b++]);
+			if (e % 2) rb = f(s[--e], rb);
+		}
+		return f(ra, rb);
+	}
+};
 
 int main() {
 
@@ -50,30 +69,35 @@ int main() {
     cin.tie(0);
 #endif
 
+    int mx = 2e5;
+    vvll b(mx + 1);
+    vi a(mx + 1);
+    iota(ALL(a), 0);
+    FL(i,2,mx+1){
+      for (ll j = i; j < mx + 1; j*=i){
+        b[i].pb(j);
+      }
+    }
+
     int TCS = 1;
     cin >> TCS;
     while(TCS--){
-      int n;
-      cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
-      }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+      int n, m;
+      cin >> n >> m;
+      Tree dp(m - n + 1, 0);
+      FL(i,2,n+1){
+        int hg = m-n+i;
+        for (int j = (hg / i) * i; j >= i; j-=i){ // all i multiples
+          dp.update(j-i, dp.query(0, j-i+1));
+          int cnt = 0;
+          for (auto x: b[i]){
+            if (j % x == 0) cnt++;
+          }
+          dp.update(j-i, dp.query(j-i, j-i+1)+cnt);
         }
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
+      cout << dp.query(0, m-n+1) << endl;
     }
-
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

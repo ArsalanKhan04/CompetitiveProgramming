@@ -36,50 +36,66 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define condprt(x) cout << ((x) ? "YES" : "NO") << endl
 
 
+int main(){
+  
+  map<vi, ll> mp;
 
-int main() {
+  // do permutation of 3
+  vi perm3(3), perm4(4), perm5(5);
+  iota(ALL(perm3), 1); iota(ALL(perm4), 1);
+  iota(ALL(perm5), 1);
 
-  ios_base::sync_with_stdio(false);
-#ifdef KRAKAR
-    ifstream fileIn("input.txt"); 
-    cin.rdbuf(fileIn.rdbuf()); 
-    ofstream fileOut("output.txt"); 
-    cout.rdbuf(fileOut.rdbuf()); 
-    auto _clock_start = chrono::high_resolution_clock::now();
-#else
-    cin.tie(0);
-#endif
-
-    int TCS = 1;
-    cin >> TCS;
-    while(TCS--){
-      int n;
-      cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
-      }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+  auto f = [mp](vi cur){
+    int n = cur.size();
+    vi a(n, 0);
+    FL(i,0,n){
+      FL(j,0,i+1){
+        FL(k,i,n){
+          bool fl = true;
+          FL(cr,j,k+1){
+            if (cr == i) continue;
+            if (cur[cr] < cur[i]) fl = false;
+          }
+          a[i]+=fl;
         }
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
     }
+    return a;
+  };
 
-#ifdef KRAKAR
-  cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
-      chrono::high_resolution_clock::now()
-      - _clock_start).count() << "ms." << endl;
-#endif
-  return 0;
+  while (true){
+    mp[f(perm3)]++;
+    if (!next_permutation(ALL(perm3))) break;
+  }
+  while (true){
+    mp[f(perm4)]++;
+    if (!next_permutation(ALL(perm4))) break;
+  }
+  while (true){
+    mp[f(perm5)]++;
+    if (!next_permutation(ALL(perm5))) break;
+  }
+
+  cout << mp.size() << endl;
+  freopen("input1.txt", "w", stdout);
+
+  cout << mp.size() << endl;
+  for (auto [ky, vl]: mp){
+    cout << ky.size() << endl;
+    for (auto x: ky){
+      cout << x << " ";
+    }
+    cout << endl;
+  }
+  freopen("output1.txt", "w", stdout);
+
+  for (auto [ky, vl]: mp){
+    cout << vl << endl;
+  }
+
+
+
+
+
 
 }
-

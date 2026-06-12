@@ -50,6 +50,17 @@ int main() {
     cin.tie(0);
 #endif
 
+    int mx = 1e6;
+    vi fc(mx+1, 0);
+    vi rev(mx+1, -1);
+    FL(i,2,mx+1){
+      if (fc[i]>=1)continue;
+      for (int j = i; j < mx + 1; j+=i){
+        fc[j]++;
+        rev[j]=i;
+      }
+    }
+
     int TCS = 1;
     cin >> TCS;
     while(TCS--){
@@ -58,22 +69,36 @@ int main() {
       vi a(n);
       FL(i, 0, n)
         cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
+      bool fl = true;
+      FL(i,0,n-1){
+        if (a[i] > a[i+1]) fl = false;
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
-        }
+      if (fl){
+        cout << "Bob" << endl;
+        continue;
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
-    }
 
+      FL(i,0,n){
+        if (fc[a[i]] > 1) fl = true;
+      }
+      if (fl){
+        cout << "Alice" << endl;
+        continue;
+      }
+
+      FL(i,0,n){
+        a[i] = rev[a[i]];
+      }
+      FL(i,0,n-1){
+        if (a[i] > a[i+1]) fl = true;
+      }
+      if (fl){
+        cout << "Alice" << endl;
+        continue;
+      }
+      cout << "Bob" << endl;
+
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

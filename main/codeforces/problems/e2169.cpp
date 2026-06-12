@@ -35,6 +35,11 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #endif
 #define condprt(x) cout << ((x) ? "YES" : "NO") << endl
 
+struct pt{
+  int ind;
+  ll x, y;
+  ll cst;
+};
 
 
 int main() {
@@ -55,25 +60,50 @@ int main() {
     while(TCS--){
       int n;
       cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
+      vector<pt> pts(n);
+      FL(i,0,n) cin >> pts[i].x;
+      FL(i,0,n) cin >> pts[i].y;
+      FL(i,0,n) {
+        pts[i].ind = i;
+        cin >> pts[i].cst;
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
-        }
-      }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
-    }
 
+      const int mx = 1<<4;
+      ll dp[mx] = {0};
+      FL(i,1,mx)dp[i]=(ll)-1e18;
+      ll ndp[mx] = {0};
+
+      int xts[] = {-1, 0, 1, 0};
+      int yts[] = {0, -1, 0, 1};
+
+      FL(i,0,n){
+        dbg(i);
+        FL(j,0,mx) ndp[j]=(ll)-1e18;
+        FL(msk,0,mx){
+          for (int pr_msk=msk;; pr_msk=(pr_msk-1)&msk){
+            if (msk == pr_msk){
+              ndp[msk]=max(dp[msk] + pts[i].cst, ndp[msk]);
+            } else {
+              int dmsk = msk ^ pr_msk;
+              ll nvl = dp[pr_msk];
+              FL(ind,0,4){
+                if ((1<<ind) & dmsk){
+                  nvl += 2*xts[ind]*pts[i].x;
+                  nvl += 2*yts[ind]*pts[i].y;
+                }
+              }
+              ndp[msk]=max(ndp[msk],nvl);
+            }
+            if (pr_msk==0) break;
+          }
+        }
+        FL(j,0,mx) dp[j]=ndp[j];
+        dbg(dp[15]);
+      }
+      cout << dp[15] << endl;
+
+      
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

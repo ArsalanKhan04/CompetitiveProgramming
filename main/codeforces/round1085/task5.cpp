@@ -35,6 +35,28 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #endif
 #define condprt(x) cout << ((x) ? "YES" : "NO") << endl
 
+vi get_a(vi b){
+  int n = b.size();
+  vi a(n);
+  set<int> st;
+  st.insert(b[0]);
+  int cr = n - 1;
+  if (b[0] <= cr) cr++;
+  a[0] = cr;
+  FL(i,1,n){
+    if (b[i] < cr && st.find(b[i]) == st.end()){
+      // no change to cr
+    } else {
+      cr--;
+      while (st.find(cr) != st.end()){
+        cr--;
+      }
+    }
+    st.insert(b[i]);
+    a[i] = cr;
+  }
+  return a;
+}
 
 
 int main() {
@@ -55,25 +77,64 @@ int main() {
     while(TCS--){
       int n;
       cin >> n;
-      vi a(n);
+      vi a(n); vi b(n, n+10);
       FL(i, 0, n)
         cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
+      vi c(n);
+      iota(ALL(c), 0);
+      reverse(ALL(c));
+
+      vi d(n);
+      FL(i,0,n) d[i] = a[i]-c[i];
+      vi e = d;
+      for (int i=n-2; i>=0; i--){
+        d[i] = min(d[i], d[i+1]);
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+
+
+      int ad=0;
+      int cr = 0;
+      bool fl=true;
+      FL(i,0,n){
+        if (d[i]-ad == 0){
+          if (a[i]-c[i]-ad == 1){
+            b[i] = c[i]+ad;
+          } else if (a[i]-c[i]-ad == 0){
+            continue;
+          } else {
+            fl=false; break;
+          }
+          continue;
+        } else if (d[i]-ad == 1){
+          b[i]=cr;
+          cr++;
+          ad++;
+          if (a[i]-c[i]-ad != 0){
+            fl = false; break;
+          }
+        } else {
+          fl=false; break;
         }
       }
+      if (fl == false){
+        cout << "NO" << endl;
+        continue;
+      }
+      cout << "YES" << endl;
       FL(i,0,n){
-        cout << a[i] << " ";
+        cout << b[i] << " ";
       }
       cout << endl;
-    }
+      /*
+      vi aa = get_a(b);
 
+      FL(i,0,n){
+        cerr << aa[i] << " ";
+      }
+      cerr << endl;
+      */
+
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

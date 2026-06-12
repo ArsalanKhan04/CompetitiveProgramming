@@ -53,27 +53,69 @@ int main() {
     int TCS = 1;
     cin >> TCS;
     while(TCS--){
-      int n;
-      cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
+      int n, k;
+      cin >> n >> k;
+      if (k & 1){
+        FL(i,0,k) cout << n << " ";
+        cout << endl;
+        continue;
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+
+      int y = n;
+      vi a;
+      while (y){
+        a.pb(y&1);
+        y>>=1;
+      }
+      reverse(ALL(a));
+
+
+      int nm1 = 0;
+      int nm2 = 0;
+
+      vector<vi> vbt(k);
+
+      int ptr = 0; // can go till k only
+
+      FL(i,0,a.size()){ // less than 25
+        if (a[i]){
+          int ptr2 = ptr;
+          if (ptr >= k){
+            ptr2 = 0;
+          }
+          vbt[ptr2].pb(0);
+          FL(j,0,k) {
+            if (j == ptr2) continue;
+            vbt[j].pb(1);
+          }
+          ptr++;
+        } else {
+          int ptr2 = min(ptr, k);
+          // this will be the number of elements done so far
+          // make sure that ptr2 is even
+          ptr2 -= ptr2 & 1;
+          FL(j,0,ptr2){
+            vbt[j].pb(1);
+          }
+          FL(j,ptr2,k){
+            vbt[j].pb(0);
+          }
         }
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
+
+      for (auto btm: vbt){
+        int nm = 0;
+        for (auto x: btm){
+          nm = nm*2 + x;
+        }
+        cout << nm << " ";
       }
       cout << endl;
-    }
 
+
+      
+
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

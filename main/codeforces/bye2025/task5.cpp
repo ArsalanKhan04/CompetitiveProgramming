@@ -55,25 +55,53 @@ int main() {
     while(TCS--){
       int n;
       cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
-      }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+      ll sm;
+      cout << "? " << 1 << " " << n << endl;
+      cout.flush();
+      cin >> sm;
+      if (sm == -1) exit(0);
+
+
+      ll x;
+      auto part = [&](int l, int h, ll csm){
+        ll hsm = csm;
+        int lg = l;
+        int hg = h;
+        while (lg <= hg){
+          int md = lg + (hg - lg) / 2;
+          cout << "? " << l << " " << md << endl;
+          cout.flush();
+          cin >> x;
+          if (x == -1) exit(0);
+          if (x < hsm){
+            lg = md + 1;
+          } else if (x == hsm) {
+            return md;
+          } else {
+            hg = md - 1;
+          }
+        }
+        return lg;
+      };
+
+      int l = 1, h = n;
+      ll nsm = sm;
+      while (l < h){
+        nsm/=2;
+        int pt = part(l, h, nsm);
+        // cout << "PART FOUND AT: " << pt << endl;
+        if (pt - l < h - pt){
+          h = pt;
+        } else {
+          l = pt + 1;
         }
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
-    }
 
+      cout << "! " << nsm << endl;
+      cout.flush();
+        
+
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

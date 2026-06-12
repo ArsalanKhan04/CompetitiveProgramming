@@ -1,3 +1,4 @@
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -53,27 +54,71 @@ int main() {
     int TCS = 1;
     cin >> TCS;
     while(TCS--){
-      int n;
-      cin >> n;
-      vi a(n);
+      int n, k;
+      cin >> n >> k;
+      dbg(n,k);
+      vi a(n); vi b(k);
       FL(i, 0, n)
         cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
+      FL(i,0,k) {
+        cin >> b[i];
+        b[i]--;
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
-        }
-      }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
-    }
+      sort(ALL(b));
+      int bind=0;
 
+      dbg("HERE");
+      vi c;
+      int pr = -1;
+      FL(i,0,n){
+        if (a[i]!=pr){
+          c.pb(a[i]);
+        }
+        if (bind<k && i==b[bind]){
+          c.back()=2; bind++;
+        }
+        pr=a[i];
+      }
+
+
+      pr=a[b.back()];
+      dbg(pr, c.size());
+      if (c.front()==pr) c.erase(c.begin(),c.begin()+1);
+      dbg(c.front(), pr, c.size());
+      int cnt = 0; int an = 0;
+      bool dec = false;
+      while (c.size()){
+        if (c.back()==2) b.pop_back();
+        if (dec && cnt > 0){
+          cnt--;
+          c.pop_back();
+          if (!cnt) dec=false;
+          continue;
+        }
+        if (c.back() == pr && b.size() && !cnt) {
+          dbg("POPPED");
+          c.pop_back();
+          continue;
+        }
+        if (c.back() == 2){
+          if (cnt){ 
+            cnt |= 1;
+            dec=true;
+            an+=cnt+1;
+          }
+          c.pop_back();
+          continue;
+        }
+        cnt++;
+        c.pop_back();
+      }
+      if (!dec)
+        an+=cnt;
+      cout << an << endl;
+
+
+        
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

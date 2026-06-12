@@ -53,27 +53,60 @@ int main() {
     int TCS = 1;
     cin >> TCS;
     while(TCS--){
-      int n;
-      cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
+      int n, k; cin >> n >> k; string s; cin >> s;
+      string ans = "";
+      FL(i,0,n) ans += "0";
+
+      int st = 0; int sm = 0;
       FL(i,0,n){
-        b[a[i]] = i;
+        if (k == 0) break;
+
+        dbg("prv", i, sm);
+        if (sm < 0){
+          if (s[i] == '('){
+            FL(j,st,i){
+              if (k == 0) break;
+              if (s[j]=='('){
+                ans[j]='1';
+                k--;
+              }
+            }
+            sm = 0;
+            st = i;
+          } else {
+            sm--;
+            continue;
+          }
+        }
+
+        if (s[i] == '(') sm++;
+        else sm--;
+        dbg("nxt", i, sm);
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+      dbg(sm, st);
+
+      if (sm <= 0){
+        FL(j,st,n){
+          if (k == 0) break;
+          if (s[j]=='('){
+            ans[j]='1';
+            k--;
+          }
+        }
+      } else {
+        FL(j,st,n){
+          if (k == 0) break;
+          if (s[j]==')'){
+            ans[j]='1';
+            k--;
+          }
         }
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
-    }
+      cout << ans << endl;
 
+
+
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

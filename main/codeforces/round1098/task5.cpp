@@ -7,7 +7,7 @@ using namespace std;
 #define FE(i, a, b) for (int i = a; i <= b; i++)
 #define FF(i, a, b) for (int i = a; i > b; i--)
 #define FFE(i, a, b) for (int i = a; i >= b; i--)
-#define ALL(x) x.begin(), x.end()
+#define ALL(x) (x).begin(), (x).end()
 #define RALL(x) x.rbegin(), x.rend()
 #define pb push_back
 #define F first
@@ -55,25 +55,50 @@ int main() {
     while(TCS--){
       int n;
       cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
+      vvi a(n+1); vi b(n+1);
+      int ky, vl; 
+      vi mp2(n+1);
+      int d[2][2]={{(int)1e9, 0}, {(int)1e9, 0}};
       FL(i,0,n){
-        b[a[i]] = i;
+        cin >> ky >> vl;
+        a[ky].pb(vl);
+        mp2[vl]++; b[vl]=1;
+        d[1][0] = min(d[1][0], vl);
+        d[1][1] = max(d[1][1], vl);
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
-        }
+      FL(i,1,n+1){
+        b[i]+=b[i-1];
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
-    }
 
+
+      ll an = 0;
+      FL(i,0,n+1){
+        if (a[i].empty()) continue;
+        for (auto v: a[i]){
+          mp2[v]--;
+          while (d[1][1]>=0 && !mp2[d[1][1]]){
+            d[1][1]--;
+          }
+          while (d[1][0]<=n && !mp2[d[1][0]]){
+            d[1][0]++;
+          }
+          d[0][0] = min(d[0][0], v);
+          d[0][1] = max(d[0][1], v);
+        }
+        if (d[1][1] < d[1][0]) break;
+        int mn = max(d[0][0], d[1][0]);
+        int mx = min(d[0][1], d[1][1]);
+        int cnt = max(b[mx]-b[mn], 0);
+        an += cnt;
+      }
+       
+      cout << an << endl;
+
+
+
+
+
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

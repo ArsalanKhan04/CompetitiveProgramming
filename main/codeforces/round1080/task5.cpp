@@ -36,6 +36,7 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define condprt(x) cout << ((x) ? "YES" : "NO") << endl
 
 
+const int md = 1e9 + 7;
 
 int main() {
 
@@ -55,25 +56,40 @@ int main() {
     while(TCS--){
       int n;
       cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
+      int U, V;
+      vvi to(n + 1);
+      FL(i,1,n + 1){
+        cin >> U >> V;
+        if (U == V) continue;
+        to[i].pb(U);
+        to[i].pb(V);
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+      vll cnt(n + 1, 0);
+      auto f = [&](auto &&slf, int u)->void{
+        dbg(u);
+        cnt[u] = 1;
+        for (auto v: to[u]){
+          slf(slf, v);  
+          cnt[u] += cnt[v];
         }
-      }
-      FL(i,0,n){
-        cout << a[i] << " ";
+      };
+
+      vll sz(n + 1, 0);
+      auto g = [&](auto &&slf, int u, ll ad)->void{
+        dbg(u);
+        sz[u] = (ad + 2*(cnt[u]-1) + 1) % md;
+        for (auto v: to[u]){
+          slf(slf, v, sz[u]);  
+        }
+      };
+
+      f(f, 1);
+      g(g, 1, 0);
+      FL(i,1,n+1){
+        cout << sz[i] << " ";
       }
       cout << endl;
     }
-
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

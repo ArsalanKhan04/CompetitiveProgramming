@@ -53,27 +53,54 @@ int main() {
     int TCS = 1;
     cin >> TCS;
     while(TCS--){
-      int n;
-      cin >> n;
+      int n, m;
+      cin >> n >> m;
       vi a(n);
       FL(i, 0, n)
         cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
+      if (m > n / 2){
+        cout << -1 << endl;
+        continue;
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+      vector<pii> vp;
+      FL(i,0,n){
+        vp.pb({a[i], i+1});
+      }
+      sort(ALL(vp));
+      vector<pii> mvs;
+      if (m == 0){
+        int cr = n - 2;
+        ll sm = 0;
+        while (cr >= 0 && sm < vp[n-1].F){
+          sm += vp[cr].F;
+          cr--;
+        }
+        if (sm < vp[n-1].F){
+          cout << -1 << endl;
+          continue;
+        }
+        FL(i,0,cr+1){
+          mvs.pb({vp[i].S, vp[i+1].S});
+        }
+        FL(i,cr+1,n-1){
+          mvs.pb({vp[i].S, vp[n-1].S});
+        }
+      } else {
+        int rm = n - (m*2);
+        FL(i,0,rm){
+          mvs.pb({vp[i].S, vp[i+1].S});
+        }
+        for (int i = n - 1; i > rm; i-=2){
+          mvs.pb({vp[i].S, vp[i-1].S});
         }
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
-    }
 
+
+      cout << mvs.size() << endl;
+      for (auto mv: mvs){
+        cout << mv.F << " " << mv.S << endl;
+      }
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

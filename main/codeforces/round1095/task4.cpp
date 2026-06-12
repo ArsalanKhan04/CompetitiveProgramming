@@ -58,22 +58,52 @@ int main() {
       vi a(n);
       FL(i, 0, n)
         cin >> a[i];
-      vi b(n + 1);
+      int ev[2], od[2];
+      ev[0]=od[0]=1e9;
+      ev[1]=od[1]=0;
+      set<pii> ods, evs;
       FL(i,0,n){
-        b[a[i]] = i;
-      }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+        if (a[i]&1){
+          od[0]=min(od[0], a[i]);
+          od[1]=max(od[1], a[i]);
+          ods.insert({a[i], i});
+        } else {
+          ev[0]=min(ev[0], a[i]);
+          ev[1]=max(ev[1], a[i]);
+          evs.insert({a[i], i});
         }
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
-    }
 
+
+      bool fl = true;
+      FL(i,0,n){
+        int mn, mni;
+        if (a[i] & 1){
+          ods.erase({a[i], i});
+          if (ods.size()){
+            mn = (*ods.begin()).F;
+            
+            mni = (*ods.begin()).S;
+            if (mn < a[i] && a[i] > ev[1] && a[mni] < ev[0]){
+              fl = false;
+            }
+          }
+        } else {
+          evs.erase({a[i], i});
+          if (evs.size()){
+            mn = (*evs.begin()).F;
+
+            mni = (*evs.begin()).S;
+            if (mn < a[i] && a[i] > od[1] && a[mni] < od[0]){
+              fl = false;
+            }
+          }
+        }
+      }
+      condprt(fl);
+
+
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

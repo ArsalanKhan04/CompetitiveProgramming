@@ -36,6 +36,7 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define condprt(x) cout << ((x) ? "YES" : "NO") << endl
 
 
+const int md = 998244353;
 
 int main() {
 
@@ -53,27 +54,34 @@ int main() {
     int TCS = 1;
     cin >> TCS;
     while(TCS--){
-      int n;
-      cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
+      ll x, n; cin >> n >> x;
+      if (x & 1) x--;
+      ll up=0,dn=0;
+      ll lft, rgt;
+      ll y;
+      if (x >= 2 && x+1 <=n){
+        y=x-2;
+        lft = y;
+        rgt = max(n-(y+3), 0LL);
+        lft /= 4; rgt /= 4;
+        lft++; rgt++;
+        lft %= md; rgt %= md;
+        dbg(lft, rgt);
+        up=lft*rgt;
+        up %= md;
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
-        }
+      if (x >= 0 && x+3<=n){
+        y=x;
+        lft = y;
+        rgt = max(n-(y+3), 0LL);
+        lft /= 4; rgt /= 4;
+        lft++; rgt++;
+        lft %= md; rgt %= md;
+        dn=lft*rgt;
+        dn %= md;
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
+      cout << (up+dn)%md << endl;
     }
-
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

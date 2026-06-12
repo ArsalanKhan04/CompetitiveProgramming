@@ -58,22 +58,19 @@ int main() {
       vi a(n);
       FL(i, 0, n)
         cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
+      vi b(n+1);
+      FL(i,0,n) b[a[i]]++;
+      if (b[0] == 1){
+        cout << "YES" << endl;
+      } else if (b[0] == 0){
+        cout << "NO" << endl;
+      } else if (b[1]){
+        cout << "YES" << endl;
+      } else {
+        cout << "NO" << endl;
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
-        }
-      }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
-    }
 
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

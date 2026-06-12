@@ -53,27 +53,41 @@ int main() {
     int TCS = 1;
     cin >> TCS;
     while(TCS--){
-      int n;
-      cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
-      }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
-        }
-      }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
-    }
+      int n, k; cin >> n >> k;
+      string a[4];
+      cin >> a[1] >> a[2];
+      a[3] = a[1];
+      FL(i,0,n) a[3][i] = ('0'+(a[1][i]!=a[2][i]));
 
+      ll vl[4] = {0};
+      FL(i,1,4){
+        ll zrs, ons; zrs=ons=0;
+        FL(j,0,n){
+          if (a[i][j]=='1') ons++;
+          else zrs++;
+        }
+        vl[i] = ons * zrs;
+      }
+
+      vector<vvll> dp(4, vvll(4, vll(k+1, -1))); 
+      // lft, rgt, k
+
+      auto f = [&](auto &&slf, int lft, int rgt, int kvl)->ll{
+        if (dp[lft][rgt][kvl]==-1) {
+          dp[lft][rgt][kvl]=vl[lft^rgt];
+          if (kvl > 1){
+            dp[lft][rgt][kvl]+=slf(slf, lft, lft^rgt, kvl-1) 
+              + slf(slf, lft^rgt, rgt, kvl-1);
+          }
+        }
+        return dp[lft][rgt][kvl];
+      };
+
+      cout << vl[1]+f(f, 1, 2, k) + vl[2] << endl;
+
+
+
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

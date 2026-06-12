@@ -50,30 +50,32 @@ int main() {
     cin.tie(0);
 #endif
 
+    vb pp(1e4, false);
+    vi prms = {};
+    FL(i,2,1e4){
+      if (pp[i]) continue;
+      for (int j = i*2; j < 1e4; j+=i) pp[j]=true;
+      prms.pb(i);
+    }
+
+
+    vll ans;
+    FL(i,100,200){
+      FL(j,0,100){
+        ans.pb((ll)prms[j]*prms[j+1]*prms[i]*prms[i+1]);
+      }
+      ans.pb(prms[100]* prms[0]*prms[i]*prms[i+1]);
+    }
+
+     
     int TCS = 1;
     cin >> TCS;
     while(TCS--){
       int n;
       cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
-      }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
-        }
-      }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
+      FL(i,0,n) cout << ans[i] << " ";
       cout << endl;
     }
-
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

@@ -58,22 +58,39 @@ int main() {
       vi a(n);
       FL(i, 0, n)
         cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
-      }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
-        }
-      }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
-    }
+      sort(ALL(a));
 
+      auto f=[&](int x){
+        // x is mex so have 0 to x - 1
+        auto b = a;
+        set<pair<int, int>> c;
+        vb rem(x, true);
+        FL(i,0,n){
+          if (b[i] < x && rem[b[i]]) rem[b[i]]=false;
+          else c.insert({b[i], i});
+        }
+        bool fl = true;
+        FL(i,0,x) if (rem[i]) {
+            int tofind = i*2+1;
+            auto itr = c.lower_bound({tofind,-1});
+            if (itr==c.end()) fl = false;
+            else {
+              c.erase(*itr);
+            }
+        }
+        return fl;
+      };
+       
+      int lw=0; int hg=n;
+      while (lw <= hg){
+        int md = lw + (hg-lw)/2;
+        if (f(md)){
+          lw = md+1;
+        } else hg=md-1;
+      }
+      cout << hg << endl;
+
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

@@ -58,22 +58,25 @@ int main() {
       vi a(n);
       FL(i, 0, n)
         cin >> a[i];
-      vi b(n + 1);
+      int mn, mx;
+      mn = *min_element(ALL(a));
+      mx = *max_element(ALL(a));
+      vi b = a;
+      sort(ALL(b));
+      set<int> st;
       FL(i,0,n){
-        b[a[i]] = i;
-      }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+        if (a[i] != b[i]){
+          st.insert(a[i]);
         }
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
+      int vl = 1e9 + 5;
+      for (auto x: st){
+        vl = min(vl, max(x-mn, mx-x));
       }
-      cout << endl;
-    }
+      cout << ((vl == 1e9+5) ? -1 : vl) << endl;
 
+
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

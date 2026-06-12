@@ -55,25 +55,70 @@ int main() {
     while(TCS--){
       int n;
       cin >> n;
-      vi a(n);
+      vi a(n); vi b(n);
       FL(i, 0, n)
         cin >> a[i];
-      vi b(n + 1);
+      FL(i, 0, n)
+        cin >> b[i];
       FL(i,0,n){
-        b[a[i]] = i;
+        if (a[i] > b[i]) swap(a[i], b[i]);
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+
+      vi c;
+      FL(i,0,n) c.pb(a[i]), c.pb(b[i]);
+      sort(ALL(c));
+      c.erase(unique(ALL(c)), c.end());
+
+      FL(i,0,n){
+        a[i] = lower_bound(ALL(c), a[i])-c.begin();
+        b[i] = lower_bound(ALL(c), b[i])-c.begin();
+      }
+
+      auto f = [&](int x){
+        stack<int> st;
+        int sgn;
+        FL(i,0,n){
+          if (a[i] < x && b[i] < x){
+            sgn = -1;
+          } else if (a[i] >= x && b[i] >= x){
+            sgn = +1;
+          } else continue;
+          if (st.empty()){
+            st.push(sgn); 
+            continue;
+          } else if (sgn==-1 && st.top()==-1){
+            continue;
+          }
+          st.push(sgn);
+        }
+        int cr = 0;
+        while (!st.empty()){
+          cr += st.top();
+          st.pop();
+        }
+        // if (x == 3) dbg(cr);
+        if (cr <= 0){
+          return false;
+        } else return true;
+      };
+
+
+      int lw = 0;
+      int hg = c.size()-1;
+
+
+      while (lw <= hg){
+        int md = lw + (hg-lw)/2;
+        if (f(md)){
+          lw = md + 1; // lw remains the same
+        } else { 
+          hg = md - 1; // + happens atleast once in hg
         }
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
-    }
 
+      cout << c[hg] << endl;
+
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

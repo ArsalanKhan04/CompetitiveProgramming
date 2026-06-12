@@ -55,25 +55,50 @@ int main() {
     while(TCS--){
       int n;
       cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
+      vll a(n+1, 0);
+      FL(i,1,n+1) cin >> a[i];
+      vll b, c; b = c = a;
+
+      FL(i,1,n+1){
+        if (b[i]<0) b[i]*=-1;
+        b[i]+=b[i-1];
+        c[i]+=c[i-1];
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+
+      ll mx = accumulate(ALL(a), 0LL);
+      int idx=-1;
+      ll sm;
+      FL(i,1,n+1){
+        if (a[i] < 0) continue;
+        sm = b[i-1] - a[i] + (c[n] - c[i]);
+        if (mx < sm){
+          mx = sm; idx = i;
+        }
+        dbg(b[i-1], a[i], c[n], c[i], i, sm);
+        dbg(b[i-1], a[i], c[n]-c[i], i, sm);
+      }
+      if (idx == -1){
+        cout << 0 << endl << endl;  continue;
+      }
+      vi mvs;
+
+      int sgn=1;
+      for(int i=idx-1; i>=1; i--){
+        if (sgn * a[i] > 0){
+          mvs.pb(i);
+          sgn*=-1;
         }
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
+      mvs.pb(idx);
+
+
+      cout << mvs.size() << endl;
+      for (auto mv: mvs){
+        cout << mv << " ";
       }
       cout << endl;
-    }
 
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

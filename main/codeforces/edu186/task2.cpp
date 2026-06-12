@@ -50,30 +50,30 @@ int main() {
     cin.tie(0);
 #endif
 
+    vi a(30);
+    FL(i,0,30){
+      a[i] = (1 << i);
+    }
+
     int TCS = 1;
     cin >> TCS;
     while(TCS--){
-      int n;
-      cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
-      }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
+      int A, B;
+      cin >> A >> B;
+      ll smA = 0;
+      ll smB = 0;
+      int lyrs = 0;
+      FL(i,0,30){
+        if (max(smA, smB) > max(A, B) ||
+            min(smA, smB) > min(A, B)){
           break;
         }
+        if (i & 1) smA += a[i];
+        else smB += a[i];
+        lyrs++;
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
+      cout << lyrs - 1 << endl;
     }
-
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

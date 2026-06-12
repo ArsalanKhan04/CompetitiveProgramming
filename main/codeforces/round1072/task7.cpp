@@ -36,6 +36,35 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define condprt(x) cout << ((x) ? "YES" : "NO") << endl
 
 
+/**
+ * Author: Lucian Bicsi
+ * Date: 2017-10-31
+ * License: CC0
+ * Source: folklore
+ * Description: Zero-indexed max-tree. Bounds are inclusive to the left and exclusive to the right.
+ * Can be changed by modifying T, f and unit.
+ * Time: O(\log N)
+ * Status: stress-tested
+ */
+struct Tree {
+	typedef int T;
+	static constexpr T unit = INT_MAX;
+	T f(T a, T b) { return min(a, b); } // (any associative fn)
+	vector<T> s; int n;
+	Tree(int n_ = 0, T def = unit) : s(2*n_, def), n(n_) {}
+	void update(int pos, T val) {
+		for (s[pos += n] = val; pos /= 2;)
+			s[pos] = f(s[pos * 2], s[pos * 2 + 1]);
+	}
+	T query(int b, int e) { // query [b, e)
+		T ra = unit, rb = unit;
+		for (b += n, e += n; b < e; b /= 2, e /= 2) {
+			if (b % 2) ra = f(ra, s[b++]);
+			if (e % 2) rb = f(s[--e], rb);
+		}
+		return f(ra, rb);
+	}
+};
 
 int main() {
 
@@ -53,27 +82,40 @@ int main() {
     int TCS = 1;
     cin >> TCS;
     while(TCS--){
-      int n;
-      cin >> n;
+      int n, q;
+      cin >> n >> q;
       vi a(n);
       FL(i, 0, n)
         cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
-      }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+      Tree seggy(n);
+      FL(i,0,n) seggy.update(i, a[i]);
+      int idx, l, r;
+      while (q--){
+        cin >> idx >> l >> r;
+        if (idx == 1){
+          seggy.update(l-1, r);
+          continue;
         }
+        r--; l--;
+        int d = r - l;
+        int hg = d;
+        int lw = 0;
+        int an = 0;
+        while (lw <= hg){
+          int md = lw + (hg-lw) / 2;
+          int mvl = seggy.query(l, l + md + 1);
+          if (mvl < md){
+            hg = md - 1;
+          } else if (mvl > md){
+            lw = md + 1;
+          } else {
+            an = 1;
+            break;
+          }
+        }
+        cout << an << endl;
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
     }
-
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

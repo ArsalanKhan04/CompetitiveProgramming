@@ -55,25 +55,46 @@ int main() {
     while(TCS--){
       int n;
       cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
+      vvi to(n);
+      int U, V;
+      FL(i,0,n-1){
+        cin>>U>>V; U--;V--;
+        to[U].pb(V);
+        to[V].pb(U);
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+      vector<array<bool, 3>> tb(n, {false});
+      auto f = [&](auto &&slf, int u, int p)->void{
+        tb[u][1] = true;
+        array<int, 3> cr = {0};
+        for (auto v: to[u]){
+          if (v==p) continue;
+          slf(slf, v, u);
+          cr[0] += tb[v][0];
+          cr[1] += tb[v][1];
+          cr[2] += tb[v][2];
+          if (u == 0)
+            FL(i,0,3){
+              dbg(v, i, tb[v][i]);
+            }
         }
-      }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
+        if (u == 0)
+          dbg(cr[0], cr[1], cr[2]);
+        if (cr[1])
+          tb[u][cr[1]%3] = true;
+        FL(i,1,min(3, cr[2])+1){
+          tb[u][(cr[1]+i)%3] = true;
+        }
+        FL(i,1,min(3, cr[0])+1){
+          tb[u][(cr[1]+i*2)%3] = true;
+        }
+        if (u == 0)
+          FL(i,0,3){
+            dbg(u, i, tb[u][i]);
+          }
+      };
+      f(f, 0, -1);
+      condprt(tb[0][0]);
     }
-
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

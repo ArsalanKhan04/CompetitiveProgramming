@@ -53,27 +53,84 @@ int main() {
     int TCS = 1;
     cin >> TCS;
     while(TCS--){
-      int n;
-      cin >> n;
-      vi a(n);
+      int n, m;
+      cin >> n >> m;
+      vpii a(n); vpii b(m);
       FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
+        cin >> a[i].F >> a[i].S;
+      FL(i, 0, m)
+        cin >> b[i].F >> b[i].S;
+
+
+      vector<ll> ans(m, 0);
+
+      vector<ll> an_f(n+1, 0);
+      ll mx_an=0;
+
+      vector<vector<array<ll, 2>>> sind(n+1);
       FL(i,0,n){
-        b[a[i]] = i;
+        sind[a[i].S].pb({a[i].F, i});
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+
+      // maintain set;
+      set<array<ll, 2>> nc; // not considered
+      set<array<ll, 2>> cc; // currently considered
+                             //
+                             //
+      FL(i,0,n){
+        nc.insert({a[i].F, i});
+      }
+
+      ll sm = 0;
+      FL(i,0,n+1){
+        // at start find value of an_f
+        an_f[i] = sm;
+
+        // now we add one value to cc
+        if (nc.empty()) break;
+        auto bg = *nc.rbegin();
+
+        nc.erase(bg);
+        cc.insert(bg);
+        sm += bg[0];
+
+        mx_an = max(mx_an, sm);
+
+        // now we remove all values that are of current i
+        for (auto cr: sind[i]){
+          if (cc.find(cr) != cc.end()){
+            sm -= cr[0];
+            cc.erase(cr);
+          } else {
+            nc.erase(cr);
+          }
         }
+
+        // now until there are i+1 values, fill cc
+        while (cc.size() != i+1){
+          if (nc.size() == 0) break;
+          bg = *nc.rbegin();
+          nc.erase(bg);
+          cc.insert(bg);
+          sm += bg[0];
+        }
+        if (cc.size() != i+1) break;
+
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
+
+      FL(i,1,n + 1){
+        an_f[i] = max(an_f[i], an_f[i-1]);
+      }
+      FL(i,0,m){
+        ans[i] = max(an_f[b[i].S] + b[i].F, mx_an);
+        cout << ans[i] << " ";
       }
       cout << endl;
-    }
 
+
+
+
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

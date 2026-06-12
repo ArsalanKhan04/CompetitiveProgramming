@@ -53,27 +53,60 @@ int main() {
     int TCS = 1;
     cin >> TCS;
     while(TCS--){
-      int n;
-      cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
-      }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+      int nn;
+      cin >> nn;
+      string s, t; cin >> s >> t;
+      auto f = [](string st){
+        int n = st.size();
+        vi a(n);
+        a[0] = 1;
+        FL(i,1,n){
+          a[i] = a[i-1];
+          a[i] += st[i] == '(' ? 1 : -1;
         }
-      }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
-    }
+        int L, R;
+        FL(i, 0, n){
+          L = i;
+          if (st[i] == ')') break;
+        }
+        FL(i, 0, n){
+          if (st[i] == '(') R = i;
+        }
 
+        int mnvl = n/2 - 1;
+        FL(i,L,R+1){
+          mnvl = min(mnvl, a[i]);
+        }
+        string tt = "";
+        FL(i,mnvl,n-mnvl){
+          tt+=st[i];
+        }
+        return tt;
+      };
+
+      s = f(s); t = f(t);
+      if (s.size() != t.size()){
+        cout << "NO" << endl;
+        continue;
+      }
+
+      nn = s.size();
+      int vl = 0;
+      FL(i,0,nn-1){
+        if (s[i] == '(' && s[i+1] != s[i]) vl++;
+      }
+      FL(i,0,nn-1){
+        if (t[i] == '(' && t[i+1] != t[i]) vl--;
+      }
+      condprt(!vl);
+
+
+
+
+
+
+
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

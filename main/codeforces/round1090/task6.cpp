@@ -53,27 +53,40 @@ int main() {
     int TCS = 1;
     cin >> TCS;
     while(TCS--){
-      int n;
-      cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
+      int x, y; cin>>x>>y;
+      if (x > y || y == 0) {
+        cout << "NO" <<endl; continue;
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
-        }
+      int n = x+y;
+      if ((n&1)&&(!y)){
+        cout << "NO" <<endl; continue;
+      } else if (!(n&1)&&(!x)){
+        cout << "NO" <<endl; continue;
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
-    }
 
+      bool fl = true;
+      if (n & 1) {
+        // root has to be odd so
+        y--;
+      } else x--;
+      int cm = 2*min(x, y); 
+      if (2+cm > n+1){
+        cout << "NO" <<endl; continue;
+      }
+      vi a(n+1, 1);
+      FL(i,2,2+cm){
+        a[i]=i-1;
+      }
+      cout << "YES" << endl;
+      FL(i,2,n+1){
+        cout << i << " " << a[i] << endl;
+      }
+
+          
+          
+
+
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

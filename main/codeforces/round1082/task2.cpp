@@ -58,22 +58,50 @@ int main() {
       vi a(n);
       FL(i, 0, n)
         cin >> a[i];
-      vi b(n + 1);
+      int mn=1e9; int cnt = 0; int prv = -1;
+      ll an = 0;
+      vll b;
+
+      vi pv(n);
+      iota(ALL(pv), 0);
+
+      set<pii> st;
+
       FL(i,0,n){
-        b[a[i]] = i;
+        if (a[i] > prv + 1 || a[i] <= mn){
+          if (prv != -1) 
+            b.pb(cnt);
+          cnt = 0;
+          mn = a[i];
+          st = set<pii>();
+        }
+        auto itr = st.lower_bound({a[i]-1, -1});
+        if (itr != st.end()){
+          pv[i] = (*itr).S;
+        }
+        // try to replace
+        itr = st.lower_bound({a[i], -1});
+        if (itr != st.end()){
+          st.erase(*itr);
+        }
+        prv = a[i];
+        st.insert({a[i], i});
+        cnt++;
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+
+      FL(i,0,n){
+        an += ((ll)i+1)*(n-i);
+        if (pv[i] != i){
+          an -= ((ll)pv[i]+1)*(n-i);
         }
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
-    }
+      cout << an << endl;
 
+
+
+
+
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

@@ -51,29 +51,72 @@ int main() {
 #endif
 
     int TCS = 1;
-    cin >> TCS;
+    // cin >> TCS;
     while(TCS--){
       int n;
       cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
-      }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+      string s; cin >> s;
+      s="$"+s;
+      // ab, bc, ac, abc
+      map<ll, ll> mp;
+      ll ab=0; ll cr=0; mp.clear();
+      mp[0]=1;
+      FL(i,1,n+1){
+        if (s[i]=='A'){
+          cr++;
+        } else if (s[i]=='B'){
+          cr--;
         }
+        if (mp.find(cr)!=mp.end()) ab+=mp[cr];
+        mp[cr]++;
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
+      ll bc=0; cr=0; mp.clear();
+      mp[0]=1;
+      FL(i,1,n+1){
+        if (s[i]=='B'){
+          cr++;
+        } else if (s[i]=='C'){
+          cr--;
+        }
+        if (mp.find(cr)!=mp.end()) bc+=mp[cr];
+        mp[cr]++;
       }
-      cout << endl;
-    }
+      ll ac=0; cr=0; mp.clear();
+      mp[0]=1;
+      FL(i,1,n+1){
+        if (s[i]=='A'){
+          cr++;
+        } else if (s[i]=='C'){
+          cr--;
+        }
+        if (mp.find(cr)!=mp.end()) ac+=mp[cr];
+        mp[cr]++;
+      }
 
+
+      map<pair<ll,ll>, ll> mp2;
+      ll abc=0; ll cr1=0; ll cr2=0;
+      mp2[{0,0}]=1;
+      FL(i,1,n+1){
+        if (s[i]=='A'){
+          cr1++;
+        } else if (s[i]=='C'){
+          cr1--;
+        }
+        if (s[i]=='B'){
+          cr2++;
+        } else if (s[i]=='C'){
+          cr2--;
+        }
+        if (mp2.find({cr1, cr2})!=mp2.end()) abc+=mp2[{cr1, cr2}];
+        mp2[{cr1, cr2}]++;
+      }
+      dbg(ab, bc, ac, abc);
+      cout << ((ll)((ll)n * (n+1)) / 2)-(ab+bc+ac-2*abc) << endl;
+
+
+
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

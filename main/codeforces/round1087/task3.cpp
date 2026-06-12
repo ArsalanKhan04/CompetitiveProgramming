@@ -1,3 +1,4 @@
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -53,27 +54,40 @@ int main() {
     int TCS = 1;
     cin >> TCS;
     while(TCS--){
-      int n;
-      cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
-      }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+      int n; cin >> n;
+      auto f=[&](int i, int j){
+        cout<<"? "<<i<<" "<<j<<endl;
+        cout.flush();
+        int x; cin >> x; 
+        if (x==-1){
+          exit(1);
+        }
+        return x;
+      };
+      bool fl=false;
+      auto g=[&fl](int i){
+        cout<<"! "<<i<<endl;
+        cout.flush();
+        fl=true;
+      };
+      int x;
+      for (int i=1; i<n;i++){
+        x=f(2*i-1, 2*i);
+        if (x){
+          g(2*i); break;
         }
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
+      if (fl) continue;
+      x=f(2*n, 1);
+      if (x){
+        g(2*n); continue;
       }
-      cout << endl;
+      x=f(2*n, 2);
+      if (x){
+        g(2*n); continue;
+      }
+      g(2*n-1);
     }
-
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

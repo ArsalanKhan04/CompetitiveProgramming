@@ -53,27 +53,50 @@ int main() {
     int TCS = 1;
     cin >> TCS;
     while(TCS--){
-      int n;
-      cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
+      int n,k,vx; cin>>n>>k>>vx; vx--;
+      int U,V;
+      vvi to(n, vi());
+      FL(i,0,n-1){
+        cin>>U>>V; U--;V--;
+        to[U].pb(V); to[V].pb(U);
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
-        }
-      }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
-    }
 
+
+      const int inf = 1e8;
+      vi dp(n, inf);
+      auto f = [&](auto &&slf, int u, int p)->void{
+        if (p != -1 && to[u].size() == 1){
+          dp[u] = 0;
+          dbg(u, dp[u]);
+          return;
+        }
+        int mnvl[2] = {inf, inf};
+        for (auto v: to[u]){
+          if (v==p) continue;
+          slf(slf, v, u);
+          if (dp[v] < mnvl[0]) {
+            mnvl[1] = mnvl[0];
+            mnvl[0] = dp[v];
+          } else if (dp[v] < mnvl[1]){
+            mnvl[1] = dp[v];
+          }
+        }
+        if (mnvl[0] + mnvl[1] + 2 > k + 1){
+          dp[u] = mnvl[0] + 1;
+        } else {
+          dp[u] = 0;
+        }
+        dbg(u, dp[u]);
+      };
+
+      f(f, vx, -1);
+      if (dp[vx]){
+        cout << "NO" << endl;
+      } else {
+        cout << "YES" << endl;
+      }
+
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

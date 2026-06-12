@@ -55,25 +55,48 @@ int main() {
     while(TCS--){
       int n;
       cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
+      vvi to(n, vi());
+      int U, V;
+      FL(i,0,n-1){
+        cin >> U >> V;
+        U--; V--;
+        to[U].pb(V);
+        to[V].pb(U);
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+
+      vvi lvl(n, vi());
+      vi pr(n);
+      vi to_lv(n);
+      auto f = [&](auto &&slf, int u, int p, int lx)->void{
+        pr[u] = p;
+        for (auto v: to[u]){
+          if (p == v) continue;
+          slf(slf, v, u, lx+1);
+        }
+        lvl[lx].pb(u);
+        to_lv[u] = lx;
+      };
+
+      f(f, 0, -1, 0);
+      vector<set<int>> lprs(n, set<int>());
+      FL(i,0,n){
+        lprs[to_lv[i]].insert(pr[i]);
+      }
+      int mxlvl = 0;
+      FL(i,0,n){
+        if (lvl[i].size() > mxlvl) mxlvl = lvl[i].size();
+      }
+      int an = 0;
+      FL(i,0,n){
+        if (lvl[i].size() < mxlvl) continue;
+        if (lprs[i].size() == 1){
+          an = max(an, (int) lvl[i].size() + 1);
+        } else {
+          an = max(an, (int) lvl[i].size());
         }
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
+      cout << an << endl;
     }
-
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

@@ -55,25 +55,37 @@ int main() {
     while(TCS--){
       int n;
       cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
-      }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+      vvi a(n+1, vi(2));
+      FL(j,0,2){
+        string s; cin >> s;
+        s="$"+s;
+        FL(i, 1, n+1){
+          a[i][j]=(s[i]=='R');
         }
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
+      vll dp(n+1, 1e9);
+      dp[0]=0;
+      FL(i,1,n+1){
+        if (i >= 2){
+          int ad=1e9;
+          FL(msk1,0,4){
+            int cr=0;
+            int bt0=msk1 & 1; int bt1=msk1>>1;
+            if (bt0!=a[i][0]) cr++; if (bt0!=a[i-1][0]) cr++;
+            if (bt1!=a[i][1]) cr++; if (bt1!=a[i-1][1]) cr++;
+            ad=min(ad,cr);
+          }
+          dp[i]=dp[i-2]+ad;
+        }
+        ll sec=dp[i-1];
+        if (a[i][0]!=a[i][1]){
+          sec+=1;
+        }
+        dp[i]=min(dp[i],sec);
       }
-      cout << endl;
-    }
+      cout << dp[n] << endl;
 
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

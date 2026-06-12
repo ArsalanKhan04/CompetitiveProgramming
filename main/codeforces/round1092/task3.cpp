@@ -58,22 +58,48 @@ int main() {
       vi a(n);
       FL(i, 0, n)
         cin >> a[i];
-      vi b(n + 1);
+      vi b=a;
+      sort(ALL(b));
+      b.erase(unique(ALL(b)), b.end());
       FL(i,0,n){
-        b[a[i]] = i;
+        a[i]=lower_bound(ALL(b), a[i])-b.begin();
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
-        }
-      }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
-    }
 
+      auto f=[&](int x){
+        int ttl=0;
+        int ple=0, pmr=0, peq=0, pcr=0;
+        int le=0; int mr=0; int eq=0; int cr=0;
+        FL(i,0,n){
+          if (a[i]<x) le++;
+          else if (a[i]>x) mr++;
+          else eq++;
+          cr++;
+          if ((cr & 1) && le+eq>mr && mr+eq > le){
+            ttl++;
+            ple=le, pmr=mr, peq=eq, pcr=cr;
+            le=0; mr=0; eq=0; cr=0;
+          }
+        }
+        if (cr > 0){
+          le+=ple;
+          mr+=pmr;
+          eq+=peq;
+          cr+=pcr;
+          if ((cr & 1) && le+eq>mr && mr+eq > le){
+          } else return -1;
+        }
+        return ttl;
+      };
+
+      int mx=1;
+      FL(x,0,b.size()){
+        mx=max(mx, f(x));
+      }
+      cout << mx << endl;
+
+
+
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()
@@ -82,4 +108,5 @@ int main() {
   return 0;
 
 }
+
 

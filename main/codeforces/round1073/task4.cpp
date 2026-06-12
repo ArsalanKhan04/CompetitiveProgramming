@@ -55,23 +55,25 @@ int main() {
     while(TCS--){
       int n;
       cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
-      }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
+      string s; cin >> s;
+      int ind = -1;
+      FL(i,0,n - 1){
+        if (s[i] == ')' && s[i+1] == '('){
+          ind = i + 2;
           break;
         }
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
+      if (ind == -1){
+        cout << -1 << endl;
+        continue;
       }
-      cout << endl;
+      bool fl = false;
+      FL(i, ind, n){
+        if (s[i] == '(') fl = true;
+      }
+      if (fl){
+        cout << n - 2 << endl;
+      } else cout << -1 << endl;
     }
 
 #ifdef KRAKAR

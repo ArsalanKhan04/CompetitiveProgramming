@@ -53,27 +53,74 @@ int main() {
     int TCS = 1;
     cin >> TCS;
     while(TCS--){
-      int n;
-      cin >> n;
-      vi a(n);
+      int n, k;
+      cin >> n >> k;
+      vi a(n); vi b(n);
       FL(i, 0, n)
         cin >> a[i];
-      vi b(n + 1);
+      FL(i, 0, n)
+        cin >> b[i];
+      
+      // case 1
+      vi c(k,-1);
+      bool fl1 = true;
       FL(i,0,n){
-        b[a[i]] = i;
+        if (i-k >= 0 && a[i] != a[i-k]){
+          c[i%k]=-2;
+        } 
       }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+      dbg(fl1);
+
+      FL(i,0,n){
+        if (b[i]!=-1 && c[i%k]!=-2){
+          if (c[i%k]!=-1 && c[i%k]!=b[i]){
+            fl1 = false;
+          }
+          c[i%k]=b[i];
+        }
+      }
+      dbg(fl1);
+      map<int, int> mp;
+      FL(i,0,k) if (c[i] != -2) mp[a[i]]++;
+      FL(i,0,k){
+        if (c[i] != -1 && c[i] != -2){
+          if (mp[c[i]] == 0) fl1 = false;
+          mp[c[i]]--;
         }
       }
       FL(i,0,n){
-        cout << a[i] << " ";
+        if(c[i%k]==-2 && b[i]!=-1 && a[i] != b[i]) fl1 = false;
       }
-      cout << endl;
-    }
+      dbg(fl1);
 
+      // case 2
+      bool fl2 = true;
+      int md = max(2 * k - n, n&1);
+      int lf=(n-md)/2; int rg=lf+md;
+
+      mp.clear();
+      FL(i,0,n){
+        if (i >= lf && i < rg){
+          mp[a[i]]++; continue;
+        }
+        if (b[i] != -1 && b[i] != a[i])fl2=false;
+      }
+
+      FL(i,lf,rg){
+        if (b[i] != -1){
+          if (mp[b[i]] == 0) fl2 = false;
+          mp[b[i]]--;
+        }
+      }
+
+
+
+      condprt(fl1||fl2);
+
+
+
+
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

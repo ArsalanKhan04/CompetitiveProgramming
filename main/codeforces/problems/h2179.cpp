@@ -50,30 +50,77 @@ int main() {
     cin.tie(0);
 #endif
 
+    const int btsz = 19;
+    vll mlp(btsz+1); FL(i,0,btsz+1) mlp[i] = (1<<i);
+    vll mp[btsz+1]; FL(i,0,btsz+1) mp[i] = vll((1<<i));
+    vll cnt[btsz+1]; FL(i,0,btsz+1) cnt[i] = vll((1<<i));
+
     int TCS = 1;
     cin >> TCS;
     while(TCS--){
-      int n;
-      cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
-      }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+      int n, q;
+      cin >> n >> q;
+      vvi prv(n + 1, vi());
+      vi hs(n + 1, 0);
+      
+      vll an(n + 1, 0);
+
+      auto ad = [&](int x){ // x is index
+        int msk = (1<<btsz)-1;
+        // we go from btsz to 1
+        x--;
+        int y = x;
+        for (int i = btsz; i >= 0; i--){
+          y &= msk;
+          mp[i][y]+=x;
+          cnt[i][y]++;
+          msk >>= 1;
         }
+      };
+
+      auto rm = [&](int x){ // x is index
+        int msk = (1<<btsz)-1;
+        // we go from btsz to 1
+        x--;
+        int y = x;
+        for (int i = btsz; i >= 0; i--){
+          y &= msk;
+          mp[i][y]-=x;
+          cnt[i][y]--;
+          msk >>= 1;
+        }
+      };
+
+      auto cmp = [&](int x){
+        int msk = (1<<btsz)-1;
+        ll ttl = 0;
+        int y = x;
+        for (int i = btsz; i >= 0; i--){
+          y &= msk;
+          ll tsm = (x*cnt[i][y]) - mp[i][y];
+          an[x] += (tsm-ttl) * mlp[i];
+          ttl += (tsm-ttl);
+          msk >>= 1;
+        }
+      };
+
+      while (q--){
+        int l, r;
+        cin >> l >> r;
+        hs[l]++;
+        prv[r].pb(l);
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
+
+      for (int i = 1; i < n + 1; i++){
+        FL(j,0,hs[i]) ad(i);
+        cmp(i);
+        for (auto j: prv[i]) rm(j);
+        cout << an[i] << " ";
       }
       cout << endl;
-    }
 
+
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

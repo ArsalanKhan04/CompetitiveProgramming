@@ -53,27 +53,47 @@ int main() {
     int TCS = 1;
     cin >> TCS;
     while(TCS--){
-      int n;
-      cin >> n;
-      vi a(n);
-      FL(i, 0, n)
+      int n, x, y;
+      cin >> n >> x >> y;
+      vi a(n + 1);
+      FL(i, 1, n+1)
         cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
-      }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+      deque<int> c, d;
+      FL(i,1,n + 1){
+        if (i > x && i <= y){
+          c.pb(a[i]); // internal
+        } else {
+          d.pb(a[i]); // external
         }
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
+      int mc = *min_element(c.begin(), c.end());
+      int md = *min_element(d.begin(), d.end());
+
+      while (!c.empty() && c.front() != mc){
+        c.push_back(c.front());
+        c.pop_front();
+      }
+
+      vi e;
+      while (!d.empty() && !c.empty() &&
+          d.front() < c.front()){
+        e.pb(d.front());
+        d.pop_front();
+      }
+      while (!c.empty()){
+        e.pb(c.front());
+        c.pop_front();
+      }
+      while (!d.empty()){
+        e.pb(d.front());
+        d.pop_front();
+      }
+
+      for (auto xx: e){
+        cout << xx << " ";
       }
       cout << endl;
     }
-
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

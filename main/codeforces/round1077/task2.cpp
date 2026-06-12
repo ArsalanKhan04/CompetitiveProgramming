@@ -53,27 +53,60 @@ int main() {
     int TCS = 1;
     cin >> TCS;
     while(TCS--){
-      int n;
-      cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
-      }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
+      int x, y;
+      cin >> x >> y;
+      int p = 0;
+      int q = 0;
+      int ind = 30;
+      int msk = (1 << 30) - 1; // last 30 digits are 1
+      set<array<int, 3>> st;
+      while (ind >= 0){
+        int cvl = 1 << ind;
+        if ((cvl & x) && (cvl & y)){
+          q++;
+          p *= 2;
+          q *= 2;
+          ind--;
           break;
+        } else if (cvl & x){
+          p += 1;
+        } else if (cvl & y){
+          q += 1;
+        } else {
+          // if p & q both 0
+          int xm = x & msk;
+          int ym = y & msk;
+          int pm1 = (p+1) << ind;
+          int qm1 = (q << ind) + ym;
+          int pm2 = (p << ind) + xm;
+          int qm2 = (q+1) << ind;
+          int scr1 = abs(x-pm1) + abs(y-qm1);
+          int scr2 = abs(x-pm2) + abs(y-qm2);
+          st.insert({scr1, pm1, qm1});
+          st.insert({scr2, pm2, qm2});
         }
+        p *= 2;
+        q *= 2;
+        ind--;
+        msk >>= 1;
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
+      while (ind >= 0){
+        p++;
+        p *= 2;
+        q *= 2;
+        ind--;
       }
-      cout << endl;
-    }
+      p /= 2;
+      q /= 2;
+      // dbg(p, q);
+      st.insert({abs(x-p) + abs(y-q), p, q});
 
+      auto an = *st.begin();
+      // dbg(an.size());
+      dbg(an[0]);
+      
+      cout << an[1] << " " << an[2] << endl;
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()

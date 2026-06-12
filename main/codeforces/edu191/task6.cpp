@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -51,29 +52,52 @@ int main() {
 #endif
 
     int TCS = 1;
-    cin >> TCS;
+    // cin >> TCS;
     while(TCS--){
-      int n;
-      cin >> n;
-      vi a(n);
-      FL(i, 0, n)
-        cin >> a[i];
-      vi b(n + 1);
-      FL(i,0,n){
-        b[a[i]] = i;
-      }
-      for (int i = n; i > 0; i--){
-        if (b[i] != n-i){
-          reverse(a.begin()+n-i, a.begin()+b[i]+1);
-          break;
+      int n = 7;
+      int lines = ceil(log2(n+1));
+
+      vvi a(n+1, vi(lines, 0));
+      FL(i,0,n+1){
+        FL(j,0,lines){
+          a[i][j] = (i & (1 << j)) > 0;
         }
       }
-      FL(i,0,n){
-        cout << a[i] << " ";
-      }
-      cout << endl;
-    }
 
+      vi c(lines);
+      iota(ALL(c), 0);
+
+      int val_count=0; int tot_count=0;
+      dbg(lines);
+      dbg(10*9*8*7*6*5*4*3*2);
+
+      while (true){
+        tot_count++;
+        vvi b(n+1, vi(lines));
+        FL(i,0,n+1){
+          FL(j,0,lines){
+            b[i][c[j]] = a[i][j];
+          }
+        }
+        vi d(n+1); vi chck(n+1); iota(ALL(chck), 0);
+        FL(i,0,n+1){
+          for (int j = lines-1; j>=0; j--){
+            d[i] = d[i]*2+b[i][j];
+          }
+        }
+        if (is_permutation(ALL(d), ALL(chck))){
+          val_count++;
+        }
+        if (!next_permutation(ALL(c))) break;
+      }
+      
+      cout << "N: " << n << " tot: " <<
+        tot_count << " - val: " << val_count << endl;
+
+
+      
+
+    }
 #ifdef KRAKAR
   cerr << "Executed in " << chrono::duration_cast<chrono::milliseconds>(
       chrono::high_resolution_clock::now()
